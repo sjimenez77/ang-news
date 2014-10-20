@@ -1,0 +1,2 @@
+# Angular News
+Awesome tutorial form thinkster [tutorial](https://thinkster.io/angulartutorial/learn-to-build-realtime-webapps/) with AngularJS, and the [Firebase](https://www.firebase.com/) service to store real time data.
