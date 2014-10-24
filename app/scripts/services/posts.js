@@ -1,71 +1,64 @@
 'use strict';
 
-app.factory('Post', function($firebase, FIREBASE_URL, User) {
-    var ref = new Firebase(FIREBASE_URL + 'posts');
+app.factory('Post', function($firebase, FIREBASE_URL) {
 
-    var posts = $firebase(ref).$asArray();
+    var ref = new Firebase(FIREBASE_URL);
+    var posts = $firebase(ref.child('posts')).$asArray();
 
     var Post = {
         all: posts,
         create: function(post) {
-            if (User.signedIn()) {
-                var user = User.getCurrent();
-
-                post.owner = user.username;
-
-                return posts.$add(post).then(function(ref) {
-                    var postId = ref.name();
-
-                    User.posts(user.username).$set(postId, postId);
-
-                    return postId;
-                });
-            }
+            return posts.$add(post).then(function(postRef) {
+                $firebase(ref.child('user_posts').child(post.creatorUID)).$push(postRef.name());
+                return postRef;
+            });
         },
-        find: function(postId) {
-            return $firebase(ref.child(postId)).$asObject();
+        get: function(postId) {
+            return $firebase(ref.child('posts').child(postId)).$asObject();
         },
-        delete: function(postId) {
-            if (User.signedIn()) {
-                var post = Post.find(postId);
+        delete: function(post) {
 
-                post.$loaded().then(function(postLoaded) {
-                    var user = User.findByUsername(post.owner), 
-                    	index = posts.$indexFor(postLoaded.$id);
+            var uid = post.creatorUID;
 
-                    posts.$remove(index).then(function() {
-                    	User.posts(user.username).$remove(postLoaded.$id);
-                    }, function(error) {
-                        console.log(error.toString());
+            Post.deleteCommentsFromPost(post.$id);
+            posts.$remove(post).then(function(postRef) {
+
+                $firebase(ref.child('user_posts').child(uid))
+                    .$asArray()
+                    .$loaded()
+                    .then(function(data) {
+                        
+                        for (var i = 0; i < data.length; i++) {
+                            var value = data[i].$value;
+                            if (value === postRef.name()) {
+                                $firebase(ref.child('user_posts').child(uid)).$remove(i);
+                                break;
+                            }
+                        }
+                        
                     });
+
+            }, function(error) {
+                console.log(error.toString());
+            });
+
+        },
+        deleteCommentsFromPost: function(postId) {
+            var index = -1;
+            var comments = $firebase(ref.child('comments'))
+                .$asArray()
+                .$loaded()
+                .then(function (data) {
+                    var index = data.$indexFor(postId);
+                    data.$remove(index).then(function (ref) {
+                        console.log('Comments removed form post:', ref.name());
+                    });
+                }, function(error) {
+                    console.log(error.toString());
                 });
-            }
         },
         comments: function(postId) {
-            return $firebase(new Firebase(FIREBASE_URL + 'comments/' + postId));
-        },
-        addComment: function(postId, comment) {
-            if (User.signedIn()) {
-                var user = User.getCurrent();
-
-                comment.username = user.username;
-
-                Post.comments(postId).$push(comment).then(function(ref) {
-                    var commentId = ref.name();
-
-                    User.comments(user.username).$set(commentId, postId);
-                });
-            }
-        },
-        deleteComment: function(postId, comment) {
-            if (User.signedIn()) {
-                var user = User.findByUsername(comment.username);
-                var commentId = comment.$id;
-
-                Post.comments(postId).$remove(commentId).then(function() {
-                    User.comments(user.username).$remove(commentId);
-                });
-            }
+            return $firebase(ref.child('comments').child(postId)).$asArray();
         }
     };
 

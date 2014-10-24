@@ -13,7 +13,7 @@
 				</a>
 			</div>
 			<div>
-				<span>submitted by <a href="#/users/{{ post.owner }}">{{ post.owner }}</a></span>
+				<span>submitted by <a ng-href="#/profile/{{ post.creatorUID }}">{{ post.creator }}</a></span>
 			</div>
 		</div>
 		<div class="col-md-2">
@@ -25,8 +25,8 @@
 	<div ng-repeat="comment in comments" class="row cmt">
 		<div class="col-md-12">
 			<p>{{ comment.text }}</p>
-			<p class="author">posted by <a href="#/users/{{ comment.username }}">{{ comment.username }}</a>
-			<a ng-click="removeComment(comment)" ng-show="signedIn() && comment.username === currentUser.username">(delete)</a></p>
+			<p class="author">posted by <a ng-href="#/profile/{{ comment.creatorUID }}">{{ comment.creator }}</a>
+			<a ng-href="" ng-click="deleteComment(comment)" ng-show="signedIn() && comment.creatorUID === user.uid">(delete)</a></p>
 		</div>
 	</div>
 
@@ -36,9 +36,9 @@
 			<p><a href="#/login">Sign in</a> to post a comment</p>
 		</div>
 
-		<form ng-show="signedIn()">
-			<textarea ng-model="comment.text" placeholder="Post a Comment" class="form-control"></textarea><br />
-			<input type="submit" ng-click="addComment()" value="Post Comment" class="btn btn-primary" />
+		<form ng-show="signedIn()" ng-submit="addComment()">
+			<textarea ng-model="commentText" placeholder="Post a Comment" class="form-control"></textarea><br />
+			<input type="submit" value="Post Comment" class="btn btn-primary" />
 		</form>
 	</div>
 

@@ -32,13 +32,23 @@ app.config(function($routeProvider) {
         })
         .when('/register', {
             templateUrl: 'views/register.html',
-            controller: 'AuthCtrl'
+            controller: 'AuthCtrl',
+            resolve: {
+                user: function(Auth) {
+                    return Auth.resolveUser();
+                }
+            }
         })
         .when('/login', {
             templateUrl: 'views/login.html',
-            controller: 'AuthCtrl'
+            controller: 'AuthCtrl',
+            resolve: {
+                user: function(Auth) {
+                    return Auth.resolveUser();
+                }
+            }
         })
-        .when('/users/:username', {
+        .when('/profile/:userId', {
             templateUrl: 'views/profile.html',
             controller: 'ProfileCtrl'
         })

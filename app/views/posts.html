@@ -15,10 +15,10 @@
 			<div>
 				<span>{{ post.score || 0 }} votes</span>
 				&mdash;
-				<span>submitted by <a href="#/users/{{ post.owner }}">{{ post.owner }}</a></span>
+				<span>submitted by <a href="#/profile/{{ post.creatorUID }}">{{ post.creator }}</a></span>
 				&mdash;
-				<a href="#/posts/{{ post.$id }}">comments</a>
-				<a href ng-click="deletePost(post.$id)" ng-show="signedIn() && post.owner === currentUser.username">delete</a>
+				<a ng-href="#/posts/{{ post.$id }}">comments</a>
+				<a ng-href="#" ng-click="deletePost(post)" ng-show="signedIn() && post.creatorUID === user.uid">delete</a>
 			</div>
 		</div>
 		<div class="col-md-2">

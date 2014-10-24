@@ -1,18 +1,30 @@
 'use strict';
 
-app.controller('PostViewCtrl', function($scope, $routeParams, Post) {
+app.controller('PostViewCtrl', function($scope, $routeParams, Post, Auth) {
 
-    $scope.post = Post.find($routeParams.postId);
+    $scope.post = Post.get($routeParams.postId);
+    $scope.comments = Post.comments($routeParams.postId);
 
-    $scope.comments = Post.comments($routeParams.postId).$asArray();
+    $scope.user = Auth.user;
+    $scope.signedIn = Auth.signedIn;
 
     $scope.addComment = function() {
-        Post.addComment($routeParams.postId, $scope.comment);
-        $scope.comment = '';
+        if (!$scope.commentText || $scope.commentText === '') {
+            return;
+        }
+
+        var comment = {
+            text: $scope.commentText,
+            creator: $scope.user.profile.username,
+            creatorUID: $scope.user.uid
+        };
+
+        $scope.comments.$add(comment);
+        $scope.commentText = '';
     };
 
-    $scope.removeComment = function(comment) {
-        Post.deleteComment($scope.post, comment);
+    $scope.deleteComment = function(comment) {
+        $scope.comments.$remove(comment);
     };
 
 });
