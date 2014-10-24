@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('PostViewCtrl', function($scope, $routeParams, Post, Auth) {
+app.controller('PostViewCtrl', function($scope, $routeParams, Post, Comment, Auth) {
 
     $scope.post = Post.get($routeParams.postId);
     $scope.comments = Post.comments($routeParams.postId);
@@ -16,10 +16,10 @@ app.controller('PostViewCtrl', function($scope, $routeParams, Post, Auth) {
         var comment = {
             text: $scope.commentText,
             creator: $scope.user.profile.username,
-            creatorUID: $scope.user.uid
+            creatorUID: $scope.user.uid, 
         };
 
-        $scope.comments.$add(comment);
+        Comment.create($routeParams.postId, comment);
         $scope.commentText = '';
     };
 

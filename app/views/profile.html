@@ -9,17 +9,35 @@
 			</span>
 		</div>
 	</div>
-	<hr>
-	<div class="post row" ng-repeat="(key,post) in posts">
-		<div class="col-md-8 col-xs-10">
-			<div class="info">
-				<a ng-href="{{ post.url }}">
-					{{ post.title }}
-					<span class="url">({{ post.url | hostnameFromUrl }})</span>
-				</a>
+	<div class="row">
+		<ul class="nav nav-tabs">
+			<li class="active"><a data-target="#submissions" data-toggle="tab">Posts</a></li>
+			<li><a data-target="#comments" data-toggle="tab">Comments</a></li>
+		</ul>
+	</div>
+	<div class="tab-content">
+		<div class="tab-pane active" id="submissions">
+			<div class="post row" ng-repeat="(key,post) in posts">
+				<div class="col-md-8 col-xs-10">
+					<div class="info">
+						<a ng-href="{{ post.url }}">
+							{{ post.title }}
+							<span class="url">({{ post.url | hostnameFromUrl }})</span>
+						</a>
+					</div>
+					<div>
+						<a ng-href="#/posts/{{ post.$id }}">comments</a>
+					</div>
+				</div>
 			</div>
-			<div>
-				<a ng-href="#/posts/{{ post.$id }}">comments</a>
+		</div>
+		<div class="tab-pane active" id="comments">
+			<div ng-repeat="comment in comments" id="comments" class="row cmt">
+				<div class="col-md-12">
+					<p>{{ comment.text }}</p>
+					<p class="author">posted by <a ng-href="#/profile/{{ comment.creatorUID }}">{{ comment.creator }}</a>
+					<a ng-href="" ng-click="deleteComment(comment)" ng-show="signedIn() && comment.creatorUID === user.uid">(delete)</a></p>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -1,6 +1,6 @@
 'use strict';
 
-app.factory('Profile', function($window, FIREBASE_URL, $firebase, Post, $q) {
+app.factory('Profile', function($window, FIREBASE_URL, $firebase, Post, Comment, $q) {
     
     var ref = new $window.Firebase(FIREBASE_URL);
 
@@ -25,6 +25,24 @@ app.factory('Profile', function($window, FIREBASE_URL, $firebase, Post, $q) {
                 });
 
             return defer.promise;
+        },
+        getComments: function(userId) {
+            var defer = $q.defer();
+
+            $firebase(ref.child('user_comments').child(userId))
+                .$asArray()
+                .$loaded()
+                .then(function(data) {
+                    var comments = {};
+
+                    for (var i = 0; i < data.length; i++) {
+                        var value = data[i].$value;
+                        comments[value] = Comment.get(value);
+                    }
+                    defer.resolve(comments);
+                });
+
+            return defer.promise;    
         }
     };
 

@@ -19,8 +19,9 @@ app.factory('Post', function($firebase, FIREBASE_URL) {
         delete: function(post) {
 
             var uid = post.creatorUID;
-
+            // It depends on security parameters
             Post.deleteCommentsFromPost(post.$id);
+            // It depends on security parameters
             posts.$remove(post).then(function(postRef) {
 
                 $firebase(ref.child('user_posts').child(uid))
@@ -44,8 +45,8 @@ app.factory('Post', function($firebase, FIREBASE_URL) {
 
         },
         deleteCommentsFromPost: function(postId) {
-            var index = -1;
-            var comments = $firebase(ref.child('comments'))
+            
+            $firebase(ref.child('comments'))
                 .$asArray()
                 .$loaded()
                 .then(function (data) {
