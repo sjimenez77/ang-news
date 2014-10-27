@@ -31,12 +31,11 @@
 				</div>
 			</div>
 		</div>
-		<div class="tab-pane active" id="comments">
+		<div class="tab-pane" id="comments">
 			<div ng-repeat="comment in comments" id="comments" class="row cmt">
 				<div class="col-md-12">
-					<p>{{ comment.text }}</p>
-					<p class="author">posted by <a ng-href="#/profile/{{ comment.creatorUID }}">{{ comment.creator }}</a>
-					<a ng-href="" ng-click="deleteComment(comment)" ng-show="signedIn() && comment.creatorUID === user.uid">(delete)</a></p>
+					<p>{{ comment.comment.text }} <a ng-href="#" ng-click="deleteComment(comment.comment)" ng-show="signedIn() && comment.comment.creatorUID === user.uid">(delete)</a></p>
+					<p class="author">posted by <a ng-href="#/profile/{{ comment.comment.creatorUID }}">{{ comment.comment.creator }}</a> in post titled <a ng-href="#/post/{{ comment.post.$id }}">{{ comment.post.title }}</a></p>
 				</div>
 			</div>
 		</div>
