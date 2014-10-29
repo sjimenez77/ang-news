@@ -26,7 +26,7 @@
 		<div class="col-md-12">
 			<p>{{ comment.text }}</p>
 			<p class="author">posted by <a ng-href="#/profile/{{ comment.creatorUID }}">{{ comment.creator }}</a>
-			<a ng-href="" ng-click="deleteComment(comment)" ng-show="signedIn() && comment.creatorUID === user.uid">(delete)</a></p>
+			<a ng-href="#/posts/{{ post.$id }}" ng-click="deleteComment(comment, $index)" ng-show="signedIn() && comment.creatorUID === user.uid">(delete)</a></p>
 		</div>
 	</div>
 

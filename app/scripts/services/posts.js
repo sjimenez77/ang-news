@@ -1,6 +1,6 @@
 'use strict';
 
-app.factory('Post', function($firebase, FIREBASE_URL) {
+app.factory('Post', function($firebase, FIREBASE_URL, $q) {
 
     var ref = new Firebase(FIREBASE_URL);
     var posts = $firebase(ref.child('posts')).$asArray();
@@ -17,7 +17,6 @@ app.factory('Post', function($firebase, FIREBASE_URL) {
             return $firebase(ref.child('posts').child(postId)).$asObject();
         },
         delete: function(post) {
-
             var uid = post.creatorUID;
             // It depends on security parameters
             Post.deleteCommentsFromPost(post.$id);
@@ -44,8 +43,7 @@ app.factory('Post', function($firebase, FIREBASE_URL) {
             });
 
         },
-        deleteCommentsFromPost: function(postId) {
-            
+        deleteCommentsFromPost: function(postId) {            
             $firebase(ref.child('comments'))
                 .$asArray()
                 .$loaded()
@@ -59,7 +57,23 @@ app.factory('Post', function($firebase, FIREBASE_URL) {
                 });
         },
         comments: function(postId) {
-            return $firebase(ref.child('comments').child(postId)).$asArray();
+            var defer = $q.defer();
+            $firebase(ref.child('comments'))
+                .$asArray()
+                .$loaded()
+                .then(function (comments) {
+                    var commentsPost = [];
+                    for (var i = comments.length - 1; i >= 0; i--) {
+                        if (comments[i].postId === postId) {
+                            commentsPost.push(comments[i]);
+                        }
+                    }
+                    defer.resolve(commentsPost);
+                }, function(error) {
+                    console.log(error.toString());
+                });
+
+            return defer.promise;
         }
     };
 

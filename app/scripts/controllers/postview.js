@@ -3,7 +3,9 @@
 app.controller('PostViewCtrl', function($scope, $routeParams, Post, Comment, Auth) {
 
     $scope.post = Post.get($routeParams.postId);
-    $scope.comments = Post.comments($routeParams.postId);
+    Post.comments($routeParams.postId).then( function (comments) {
+        $scope.comments = comments;
+    });
 
     $scope.user = Auth.user;
     $scope.signedIn = Auth.signedIn;
@@ -16,15 +18,19 @@ app.controller('PostViewCtrl', function($scope, $routeParams, Post, Comment, Aut
         var comment = {
             text: $scope.commentText,
             creator: $scope.user.profile.username,
-            creatorUID: $scope.user.uid, 
+            creatorUID: $scope.user.uid,
+            postId: $scope.post.$id 
         };
 
         Comment.create($routeParams.postId, comment);
+        $scope.comments.push(comment);
         $scope.commentText = '';
     };
 
-    $scope.deleteComment = function(comment) {
-        $scope.comments.$remove(comment);
+    $scope.deleteComment = function(comment, index) {
+        Comment.delete(comment).then( function () {
+            $scope.comments.splice(index, 1);
+        });
     };
 
 });

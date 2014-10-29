@@ -37,9 +37,7 @@ app.factory('Profile', function($window, FIREBASE_URL, $firebase, Post, Comment,
 
                     for (var i = 0; i < data.length; i++) {
                         var value = data[i].$value;
-                        Comment.get(value).then(function (result) {
-                            comments[value] = result;
-                        });
+                        comments[value] = Comment.get(value);
                     }
                     defer.resolve(comments);
                 });

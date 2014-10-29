@@ -1,8 +1,13 @@
 'use strict';
 
-app.controller('ProfileCtrl', function($scope, $routeParams, Profile, Comment, Auth) {
+app.controller('ProfileCtrl', function($scope, $routeParams, $rootScope, Profile, Comment, Post, Auth) {
 
     var uid = $routeParams.userId;
+
+    var getPostTitle = function(postId) {
+        var post = Post.get(postId);
+        return post.title;
+    };
 
     $scope.user = Auth.user;
     $scope.signedIn = Auth.signedIn;
@@ -16,7 +21,25 @@ app.controller('ProfileCtrl', function($scope, $routeParams, Profile, Comment, A
         $scope.comments = comments;
     });
 
-    $scope.deleteComment = function (comment) {
-        Comment.deleteComment(comment);
+    $scope.deleteComment = function (comment, index) {
+        Comment.delete(comment).then( function () {
+            $scope.comments.splice(index, 1);
+        });
+    };
+
+    $scope.toggleEditMode = function (comment) {
+        angular.forEach($scope.comments, function (item) {
+            if (item.$id === comment.$id) {
+                comment.edit = !item.edit;
+            }
+        });
+    };
+
+    $scope.editComment = function (comment, index) {
+        angular.forEach($scope.comments, function (item) {
+            if (item.$id === comment.$id) {
+                comment.edit = !item.edit;
+            }
+        });
     };
 });

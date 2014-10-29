@@ -34,8 +34,21 @@
 		<div class="tab-pane" id="comments">
 			<div ng-repeat="comment in comments" id="comments" class="row cmt">
 				<div class="col-md-12">
-					<p>{{ comment.comment.text }} <a ng-href="#" ng-click="deleteComment(comment.comment)" ng-show="signedIn() && comment.comment.creatorUID === user.uid">(delete)</a></p>
-					<p class="author">posted by <a ng-href="#/profile/{{ comment.comment.creatorUID }}">{{ comment.comment.creator }}</a> in post titled <a ng-href="#/post/{{ comment.post.$id }}">{{ comment.post.title }}</a></p>
+					<p ng-hide="comment.edit">{{ comment.text }} <span ng-show="signedIn() && comment.creatorUID === user.uid">
+						<button class="btn btn-primary btn-xs" ng-click="toggleEditMode(comment)">edit</button>
+						<button class="btn btn-danger btn-xs" ng-click="deleteComment(comment, $index)">delete</button>
+						</span>
+					</p>
+					<div ng-show="comment.edit !== false && comment.edit !== undefined">
+						<p>
+						<form ng-submit="editComment(comment, $index)" ng-show="comment.edit !== false && comment.edit !== undefined">
+							<textarea ng-model="comment.text" placeholder="Edit the comment" class="form-control"></textarea><br />
+							<input type="submit" value="Edit Comment" class="btn btn-primary" />
+							<button class="btn btn-default" ng-click="toggleEditMode(comment)">Cancel</button>
+						</form>
+						</p>
+					</div>
+					<p class="author">posted by <a ng-href="#/profile/{{ comment.creatorUID }}">{{ comment.creator }}</a> in post titled <post-title postId="{{ comment.postId }}"></post-title></p>
 				</div>
 			</div>
 		</div>
