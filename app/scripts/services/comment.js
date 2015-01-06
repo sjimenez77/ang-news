@@ -2,7 +2,7 @@
 
 app.factory('Comment', function($firebase, $window, FIREBASE_URL, Post, Auth, $q) {
 
-    var ref = new $window.Firebase(FIREBASE_URL);
+    var ref = new Firebase(FIREBASE_URL);
     var comments = $firebase(ref.child('comments')).$asArray();
     var user = Auth.user;
 
