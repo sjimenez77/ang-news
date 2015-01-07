@@ -1,22 +1,21 @@
 'use strict';
 
-app.factory('Auth', function($firebase, $firebaseSimpleLogin, FIREBASE_URL, $rootScope) {
+app.factory('Auth', function($firebase, $firebaseAuth, FIREBASE_URL, $rootScope) {
     var ref = new Firebase(FIREBASE_URL);
-
-    var auth = $firebaseSimpleLogin(ref);
+    var auth = $firebaseAuth(ref);
 
     var Auth = {
         register: function(user) {
             return auth.$createUser(user.email, user.password);
         },
         login: function(user) {
-            return auth.$login('password', user);
+            return auth.$authWithPassword(user);
         },
         logout: function() {
-            auth.$logout();
+            auth.$unauth();
         },
         resolveUser: function() {
-            return auth.$getCurrentUser();
+            return auth.$waitForAuth();
         },
         signedIn: function() {
             return !!Auth.user.provider;
@@ -33,20 +32,20 @@ app.factory('Auth', function($firebase, $firebaseSimpleLogin, FIREBASE_URL, $roo
         user: {}
     };
 
-    $rootScope.$on('$firebaseSimpleLogin:login', function(e, user) {
-        angular.copy(user, Auth.user);
-        Auth.user.profile = $firebase(ref.child('profile').child(Auth.user.uid)).$asObject();
+    auth.$onAuth(function(user) {
+        if (user) {
+            angular.copy(user, Auth.user);
+            Auth.user.profile = $firebase(ref.child('profile').child(Auth.user.uid)).$asObject();
 
-        console.log(Auth.user);
-    });
+            console.log(Auth.user);
+        } else {
+            console.log('logged out');
 
-    $rootScope.$on('$firebaseSimpleLogin:logout', function() {
-        console.log('logged out');
-
-        if (Auth.user && Auth.user.profile) {
-            Auth.user.profile.$destroy();
+            if (Auth.user && Auth.user.profile) {
+                Auth.user.profile.$destroy();
+            }
+            angular.copy({}, Auth.user);
         }
-        angular.copy({}, Auth.user);
     });
 
     return Auth;
